@@ -1,0 +1,35 @@
+name: Sync API to Hugging Face
+
+on:
+  push:
+    branches: [ "main", "master" ]
+    # Only run this action if files inside the API folder change
+    paths:
+      - 'baifern-detection-api/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Push to Hugging Face Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          # Navigate into the API directory
+          cd baifern-detection-api
+          
+          # Initialize a temporary fresh Git instance just for this folder
+          git init
+          git checkout -b main
+          git config user.name "GitHub Action"
+          git config user.email "action@github.com"
+          
+          # Add and commit just the API files
+          git add .
+          git commit -m "Automated deployment from GitHub"
+          
+          # Force push this isolated folder to the root of the Hugging Face Space
+          git push --force https://NoHaxJustTuL:${HF_TOKEN}@huggingface.co/spaces/NoHaxJustTuL/baifern-detection-api main
