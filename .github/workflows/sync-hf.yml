@@ -21,4 +21,4 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          hf upload NoHaxJustTuL/baifern-detection-api ./baifern-detection-api . --repo-type space
+          hf upload NoHaxJustTuL/baifern-detection-api ./baifern-detection-api . --repo-type space --exclude "*.pkl"
