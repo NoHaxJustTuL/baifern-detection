@@ -27,6 +27,10 @@ jobs:
           git config user.name "GitHub Action"
           git config user.email "action@github.com"
           
+          # --- Tell Git to handle the model as a Large File ---
+          git lfs install
+          git lfs track "*.pkl"
+
           # Add and commit just the API files
           git add .
           git commit -m "Automated deployment from GitHub"
