@@ -1,9 +1,7 @@
-name: Sync API to Hugging Face
-
+name: Sync to Hugging Face Hub
 on:
   push:
-    branches: [ "main", "master" ]
-    # Only run this action if files inside the API folder change
+    branches: [main]
     paths:
       - 'baifern-detection-api/**'
 
@@ -11,33 +9,16 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      # 1. Grab your code from GitHub
+      - uses: actions/checkout@v3
 
-      - name: Push to Hugging Face Space
+      # 2. Install the official Hugging Face uploader tool
+      - name: Install Hugging Face CLI
+        run: pip install -U "huggingface_hub[cli]"
+
+      # 3. Upload the folder directly to your Space (Handles large files automatically!)
+      - name: Direct API Upload to Hugging Face
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          # 1. Force Git and Git LFS to use your token for all uploads
-          git config --global credential.helper store
-          echo "https://NoHaxJustTuL:${HF_TOKEN}@huggingface.co" > ~/.git-credentials
-          
-          # 2. Navigate into the API directory
-          cd baifern-detection-api
-          
-          # 3. Initialize a temporary fresh Git instance
-          git init
-          git checkout -b main
-          git config user.name "GitHub Action"
-          git config user.email "action@github.com"
-          
-          # 4. Tell Git to handle the model as a Large File
-          git lfs install
-          git lfs track "*.pkl"
-          
-          # 5. Add and commit just the API files
-          git add .
-          git commit -m "Automated deployment from GitHub"
-          
-          # 6. Push to Hugging Face (URL is cleaner now because credentials are saved globally)
-          git push --force https://huggingface.co/spaces/NoHaxJustTuL/baifern-detection-api main
+          huggingface-cli upload NoHaxJustTuL/baifern-detection-api ./baifern-detection-api / --repo-type=space --token=$HF_TOKEN
