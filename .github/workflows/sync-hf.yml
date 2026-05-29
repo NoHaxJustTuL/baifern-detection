@@ -18,22 +18,26 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          # Navigate into the API directory
+          # 1. Force Git and Git LFS to use your token for all uploads
+          git config --global credential.helper store
+          echo "https://NoHaxJustTuL:${HF_TOKEN}@huggingface.co" > ~/.git-credentials
+          
+          # 2. Navigate into the API directory
           cd baifern-detection-api
           
-          # Initialize a temporary fresh Git instance just for this folder
+          # 3. Initialize a temporary fresh Git instance
           git init
           git checkout -b main
           git config user.name "GitHub Action"
           git config user.email "action@github.com"
           
-          # --- Tell Git to handle the model as a Large File ---
+          # 4. Tell Git to handle the model as a Large File
           git lfs install
           git lfs track "*.pkl"
-
-          # Add and commit just the API files
+          
+          # 5. Add and commit just the API files
           git add .
           git commit -m "Automated deployment from GitHub"
           
-          # Force push this isolated folder to the root of the Hugging Face Space
-          git push --force https://NoHaxJustTuL:${HF_TOKEN}@huggingface.co/spaces/NoHaxJustTuL/baifern-detection-api main
+          # 6. Push to Hugging Face (URL is cleaner now because credentials are saved globally)
+          git push --force https://huggingface.co/spaces/NoHaxJustTuL/baifern-detection-api main
