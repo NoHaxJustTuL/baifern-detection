@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baifern API Diagnostics</title>
+    <style>
+        body { 
+            font-family: sans-serif; 
+            padding: 40px; 
+            max-width: 600px; 
+            margin: 0 auto; 
+            background-color: #fafafa;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        input[type="file"] {
+            margin: 20px 0;
+            padding: 10px;
+            border: 2px dashed #ccc;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        #raw-output {
+            background: #1e1e1e;
+            color: #4af626;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            min-height: 100px;
+            overflow-x: auto;
+        }
+        .status { color: #666; font-style: italic; margin-bottom: 5px;}
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Baifern Backend Tester 🧪</h2>
+        <p>Upload a photo to test the connection to Hugging Face and see the raw JSON output from your model.</p>
+        
+        <input type="file" id="image-upload" accept="image/*">
+        
+        <div class="status" id="status-text">Status: Waiting for image...</div>
+        <pre id="raw-output">{}</pre>
+    </div>
+
+    <script type="module">
+        // Import the official Gradio JS client
+        import { client } from "https://cdn.jsdelivr.net/npm/@gradio/client/dist/index.min.js";
+
+        const fileInput = document.getElementById('image-upload');
+        const outputBox = document.getElementById('raw-output');
+        const statusText = document.getElementById('status-text');
+
+        // This points exactly to your Hugging Face Space
+        const SPACE_ID = "NoHaxJustTuL/baifern-detection-api";
+
+        fileInput.addEventListener('change', async (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            statusText.textContent = "Status: Connecting to Hugging Face... (May take 10s if the Space is asleep)";
+            outputBox.textContent = "Loading...";
+
+            try {
+                // 1. Initialize connection to your API
+                const app = await client(SPACE_ID);
+                
+                statusText.textContent = "Status: Sending image to model...";
+
+                // 2. Send the image to the /predict endpoint
+                const result = await app.predict("/predict", [file]);
+                
+                // 3. Format and display the raw JSON returned by app.py
+                statusText.textContent = "Status: Success!";
+                outputBox.textContent = JSON.stringify(result.data, null, 2);
+                
+            } catch (error) {
+                statusText.textContent = "Status: Connection Failed!";
+                outputBox.textContent = "Error Details:\n" + error.message;
+                console.error(error);
+            }
+        });
+    </script>
+</body>
+</html>

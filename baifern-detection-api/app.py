@@ -1,7 +1,7 @@
 import gradio as gr
 from fastai.vision.all import *
 
-# 1. Your custom Baifern labeling function (Required for the pickle file to load)
+# 1. Your custom Baifern labeling function
 def get_label(file_path):
     if 'NotBaifern' in str(file_path):
         return 'NotBaifern'
@@ -14,14 +14,19 @@ categories = learn.dls.vocab
 
 # 3. Define the prediction function
 def classify_image(img):
+    # SAFETY CATCH: If Gradio's JS API sends a dictionary, extract the raw path string
+    if isinstance(img, dict) and "path" in img:
+        img = img["path"]
+        
+    # Pass the raw string path DIRECTLY to fastai to prevent the fasttransform bug
     pred, idx, probs = learn.predict(img)
+    
     final_answer = f"Final Answer: {str(pred)}"
     confidences = dict(zip(categories, map(float, probs)))
     return final_answer, confidences
 
 # 4. Set up the Gradio Interface components
-# This type="pil" flag fixes all the input bugs!
-image_input = gr.Image(type="pil") 
+image_input = gr.Image(type="filepath") 
 text_output = gr.Textbox(label="Prediction")
 label_output = gr.Label(label="Confidence Levels")
 
