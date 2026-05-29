@@ -1,6 +1,12 @@
 import gradio as gr
 from fastai.vision.all import *
 
+def get_label(file_path):
+    if 'NotBaifern' in str(file_path):
+        return 'NotBaifern'
+    else:
+        return 'Baifern'
+    
 # 1. Load the model
 learn = load_learner('model.pkl')
 categories = learn.dls.vocab
