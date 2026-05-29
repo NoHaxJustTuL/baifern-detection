@@ -24,4 +24,4 @@ intf = gr.Interface(
 )
 
 intf.launch()
-# Triggering CI/CD pipeline
+# Triggering CI/CD pipeline# Triggering HF CLI Pipeline
