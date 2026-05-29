@@ -12,13 +12,13 @@ jobs:
       # 1. Grab your code from GitHub
       - uses: actions/checkout@v3
 
-      # 2. Install the official Hugging Face uploader tool
-      - name: Install Hugging Face CLI
+      # 2. Install the Hugging Face hub library
+      - name: Install Hugging Face Hub
         run: pip install -U "huggingface_hub[cli]"
 
-      # 3. Upload the folder directly to your Space (Handles large files automatically!)
+      # 3. Upload using the new 'hf' command
       - name: Direct API Upload to Hugging Face
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          huggingface-cli upload NoHaxJustTuL/baifern-detection-api ./baifern-detection-api / --repo-type=space --token=$HF_TOKEN
+          hf upload NoHaxJustTuL/baifern-detection-api ./baifern-detection-api . --repo-type space
